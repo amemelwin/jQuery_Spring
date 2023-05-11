@@ -2,9 +2,38 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/common :: head('jQuery Training May 11')"></head>
 <body>	
+	<div class="container mx-auto mt-5 row">
+		<div th:each="item:${items}" th:object="${item}" class="col-3 mb-3 "  >
+			<div class="card " style="border-radius:20px" th:id="*{id}" th:price="*{price}" th:pick="0">
+				<img class="card-img-top"  style="border-radius:20px 20px 0 0" th:src="*{imgUrl}" alt="Card image cap" >
+				<div class="card-body">
+					<h5 class="card-title" th:text="*{#numbers.formatDecimal(price, 0, 'COMMA', 0, 'POINT')}+' $'"></h5>
+					<p class="card-text" th:text="*{title}"></p>
+					<div class="d-flex flex-row justify-content-center">
+						<a href="#" class="btn btn-outline text-primary">Add to Cart <i class="bi bi-cart-dash"></i><i class="bi bi-check2 h2 d-none"></i></a>
+					</div>					
+				</div>
+			</div>
+		</div>		
+	</div>
 	<script>	
 		$(document).ready(()=>{
-			alert("Hello AKMA");			
+			//alert("Hello AKMA");	
+			$('.card').on("click",function(){
+				let id = $( this ).attr('id');
+				let price = $( this ).attr('price');
+				let pick = $( this ).attr('pick');
+				//let pick = $(this).children().eq(0).attr('pick');
+				//let pick = $('.card > img[pick="0"]').attr('pick');
+				if(pick){
+					 $( this ).attr('pick','0');
+				}else{
+					$( this ).attr('pick','1');
+				}
+				console.log(id,price,pick);
+			});
+			
+		
 		});
 	</script>
 </body>
