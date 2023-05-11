@@ -14,7 +14,15 @@
 					</div>					
 				</div>
 			</div>
-		</div>		
+		</div>	
+	</div>
+	<div class="container mx-auto my-5">
+		<div id="list" class="w-50 mx-auto">
+			<div class="d-flex flex-row justify-content-between">
+				<div>id</div>
+				<div>price</div>
+			</div>
+		</div>	
 	</div>
 	<script>	
 		$(document).ready(()=>{
@@ -29,6 +37,13 @@
 					$( this ).attr('pick','1');
 					$("#cart"+id).css("display","none");
 					$("#check"+id).css("display","inline");
+					let html = `
+						<div class="d-flex flex-row justify-content-between">
+							<div>${id}</div>
+							<div>${price}</div>
+						</div>
+					`;
+					$("#list").append(html);
 				}else{
 					$( this ).attr('pick','0');
 					$("#cart"+id).css("display","inline");
