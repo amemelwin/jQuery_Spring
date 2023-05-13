@@ -18,7 +18,7 @@ public class JqueryController {
 	@Autowired
 	ItemService itemService;
 	
-	@GetMapping("/")
+	@GetMapping("/index")
 	public String index(Model model) {
 		model.addAttribute("items",this.itemService.getItems());
 		return "screen/index";
@@ -36,7 +36,7 @@ public class JqueryController {
 	}
 	
 	
-	@GetMapping("/lesson2")
+	@GetMapping("/")
 	public String lessonTwo() {
 		return "screen/lesson2";
 	}

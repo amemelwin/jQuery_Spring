@@ -60,23 +60,77 @@
 	<script>
 
 
-	const copy= ()=>{
-		
+	const switchShop = (shop,id,name,age)=>{
+		let updatedShop = shop=='shop1'? 'shop2' : 'shop1';
+		appendElement(name,age,updatedShop);
+		deleteEmployee(shop,id);
+	}
+	
+	const updateEmployee = (shop,id,updatedName,updatedAge)=>{
+		let shopElement = $("#"+shop);
+		let employees = [];
+		let number = 0;
+		shopElement.children().each((index, element) => {
+			if(index<2){ // this is default element
+				employees = [...employees,element];
+			}else{
+				if($(element).attr("id")!=id){			
+					let name = $(element).attr("name");
+					let age = $(element).attr("age");
+					let shop = $(element).attr("shop");
+					employees = [...employees, createElement(++number,name,age,shop) ];
+				}else{
+					employees = [...employees, createElement(++number,updatedName,updatedAge,shop) ];
+				}
+			}
+		 });
+		shopElement.html(employees);	
 	}
 	
 	const deleteEmployee = (shop,id)=>{
-		console.log(shop);
-		console.log(id);
 		let shopElement = $("#"+shop);
 		let employees = [];
-		shopElement.children().each(function(){
-			if($(this).attr("id")!=id){
-				employees = [...employees,$(this)];
+		// old coding
+		  // shopElement.children().each(function(){
+		  // 	if($(this).attr("id")!=id){
+		  // 		employees = [...employees,$(this)];
+		  // 	}
+		  // });
+		// old coding
+
+		let number = 0;
+		shopElement.children().each((index, element) => {
+			if(index<2){ // this is default element
+				employees = [...employees,element];
+			}else{
+				if($(element).attr("id")!=id){			
+					let name = $(element).attr("name");
+					let age = $(element).attr("age");
+					let shop = $(element).attr("shop");
+					employees = [...employees, createElement(++number,name,age,shop) ];
+				}
 			}
-		});
+		 });
 		shopElement.html(employees);
 	}
 	
+	const createElement = (no,name,age,shop)=>{
+		let shopElement = $("#"+shop);
+		const randomId = Math.random();
+		const html = `
+			<div id="${randomId}" name="${name}" age="${age}" shop="${shop}" class="d-flex flex-row mx-2 justify-content-between"> 
+				<div class="col-2">${no}</div>
+				<div class="col-5">${name}</div>
+				<div class="col-2">${age}</div>
+				<div class="col-3 d-flex flex-row justify-content-center">
+					<i onClick="switchShop('${shop}','${randomId}','${name}','${age}')" class="bi bi-arrow-repeat text-info" style="cursor:pointer;"></i>					
+					<i onClick="startUpdate('${randomId}','${shop}','${name}','${age}')" class="bi bi-pencil text-warning mx-2" style="cursor:pointer;"></i>
+					<i onClick="deleteEmployee('${shop}','${randomId}')" class="bi bi-x-circle-fill text-danger" style="cursor:pointer;"></i>
+				</div>
+			</div>
+		`;
+		return html;
+	}
 	const startUpdate = (id,shop,name,age)=>{
 		$("#title").text("Update Employee");
 		$("button[name='action']").text("Update");
@@ -85,6 +139,25 @@
 		$("#name").val(name);
 		$("#age").val(age);
 		$("#shop").val(shop);
+	}
+	
+	const appendElement = (name,age,shop)=>{
+		let shopElement = $("#"+shop);
+		const no = (shopElement.children().length-2)+1;
+		const randomId = Math.random();
+		const html = `
+			<div id="${randomId}" name="${name}" age="${age}" shop="${shop}" class="d-flex flex-row mx-2 justify-content-between"> 
+				<div class="col-2">${no}</div>
+				<div class="col-5">${name}</div>
+				<div class="col-2">${age}</div>
+				<div class="col-3 d-flex flex-row justify-content-center">
+				<i onClick="switchShop('${shop}','${randomId}','${name}','${age}')" class="bi bi-arrow-repeat text-info" style="cursor:pointer;"></i>					
+					<i onClick="startUpdate('${randomId}','${shop}','${name}','${age}')" class="bi bi-pencil text-warning mx-2" style="cursor:pointer;"></i>
+					<i onClick="deleteEmployee('${shop}','${randomId}')" class="bi bi-x-circle-fill text-danger" style="cursor:pointer;"></i>
+				</div>
+			</div>
+		`;
+		shopElement.append(html);
 	}
 	
 	$("document").ready(function(){
@@ -103,8 +176,9 @@
 					appendElement(name,age,shop);
 				}else{
 					// Update old shop
-					deleteEmployee(shop,id);
-					appendElement(name,age,shop);
+					updateEmployee(shop,id,name,age);
+					// deleteEmployee(shop,id);
+					// appendElement(name,age,shop);
 				}
 			}else{
 				appendElement(name,age,shop);
@@ -119,28 +193,7 @@
 			$("#title").text("Add New Employee");
 			$("button[name='action']").text("Add");
 		});
-		
-
-		
-		const appendElement = (name,age,shop)=>{
-			let shopElement = $("#"+shop);
-			const no = (shopElement.children().length-2)+1;
-			const randomId = Math.random();
-			const html = `
-				<div id="${randomId}" class="d-flex flex-row mx-2 justify-content-between"> 
-					<div class="col-2">${no}</div>
-					<div class="col-5">${name}</div>
-					<div class="col-2">${age}</div>
-					<div class="col-3 d-flex flex-row justify-content-center">
-						<i class="bi bi-arrow-repeat text-info" style="cursor:pointer;"></i>					
-						<i onClick="startUpdate('${randomId}','${shop}','${name}','${age}')" class="bi bi-pencil text-warning mx-2" style="cursor:pointer;"></i>
-						<i onClick="deleteEmployee('${shop}','${randomId}')" class="bi bi-x-circle-fill text-danger" style="cursor:pointer;"></i>
-					</div>
-				</div>
-			`;
-			shopElement.append(html);
-		}
-		
+	
 	});
 			
 	</script>
