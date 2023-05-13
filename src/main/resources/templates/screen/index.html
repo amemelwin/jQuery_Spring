@@ -3,55 +3,139 @@
 <head th:replace="fragments/common :: head('jQuery Training May 11')"></head>
 <body>	
 	<div class="container mx-auto mt-5 row">
-		<div th:each="item:${items}" th:object="${item}" class="col-3 mb-3 "  >
-			<div class="card " style="border-radius:20px" th:id="*{id}" th:price="*{price}" th:pick="0">
+		<div th:each="item : ${items}" th:object="${item}" class="col-3 mb-3 "  >
+			<div class="card"  style="border-radius:20px; cursor:pointer;" th:id="*{id}" th:price="*{price}" th:pick="0">
 				<img class="card-img-top"  style="border-radius:20px 20px 0 0" th:src="*{imgUrl}" alt="Card image cap" >
 				<div class="card-body">
 					<h5 class="card-title" th:text="*{#numbers.formatDecimal(price, 0, 'COMMA', 0, 'POINT')}+' $'"></h5>
 					<p class="card-text" th:text="*{title}"></p>
 					<div class="d-flex flex-row justify-content-center">
-						<a href="#" class="btn btn-outline text-primary">Add to Cart <i th:id="'cart'+*{id}" class="bi bi-cart-dash"></i><i th:id="'check'+*{id}" style="display: none;" class="bi bi-check2 h2"></i></a>
+						<div th:onClick="@{pickItem({id},{price})  (id=*{id},price=*{price})}" class="btn btn-outline text-primary">Add to Cart <i th:id="'cart'+*{id}" class="bi bi-cart-dash"></i><i th:id="'check'+*{id}" style="display: none;" class="bi bi-check2 h2"></i></div>
 					</div>					
 				</div>
 			</div>
 		</div>	
 	</div>
-	<div class="container mx-auto my-5">
+	<form th:action="@{order/create}" method="post" class="container mx-auto my-5">
+		<input type="text" name="order" value="">
 		<div id="list" class="w-50 mx-auto">
 			<div class="d-flex flex-row justify-content-between">
-				<div>id</div>
-				<div>price</div>
+						<div>id</div>
+						<div>price</div>
+						<div>del</div>
 			</div>
 		</div>	
-	</div>
+		<button class="btn btn-primary" type="submit">Submit</button>
+	</form>
 	<script>	
-		$(document).ready(()=>{
-			//alert("Hello AKMA");	
+		const pickItem = (id,price)=>{
+			let card = $(`#${id}`);
+			const pick = card.attr("pick")
+			if(pick == "1"){
+				card.attr("pick","0");
+				$("#cart"+id).css("display","inline");
+				$("#check"+id).css("display","none");
+				deleteItem(id);
+			}else{
+				card.attr("pick","1");
+				$("#cart"+id).css("display","none");
+				$("#check"+id).css("display","inline");
+				//$(`i[id='check${id}']`).css("display","inline");
+				
+				//Append List
+				const html = `
+					<div class="d-flex flex-row justify-content-between" item-id="${id}">
+						<div>${id}</div>
+						<div>${price}</div>
+						<div onClick="deleteItem(${id})" style="cursor:pointer;">x</div>
+					</div>
+				`;
+							
+				// Append Input
+				let input = $('input[name="order"]');
+				const inputData = input.attr("value");
+				if(!inputData){
+					input.attr("value", JSON.stringify([id]) );
+					$("#list").append(html);
+				}else{
+					// Duplicate check
+					const oldData = JSON.parse(inputData);
+					if(!oldData.includes(id)){
+						input.attr("value",JSON.stringify( [...oldData,id] ));
+						$("#list").append(html);
+					}
+				}
+			}
+		}
+		
+		const deleteItem = (id)=>{ //id=3  [1,2,3]
+			let list = $("#list");
+			let updatedChild = [];
+			// Remove From List
+			list.children().each(function () {
+				let currentId= $(this).attr("item-id");
+			    if(currentId!=id){
+			    	updatedChild = [...updatedChild,$(this)];			    	
+			    }
+			});
+		    $("#list").html(updatedChild);
+			
+			//Remove From Inputdata 	
+			let input= $("input[name='order']");
+			let orderList = JSON.parse(input.attr("value"));
+			let updatedList= orderList.filter((i)=>i!=id);
+			input.attr("value",JSON.stringify(updatedList));			
+		}
+		
+		$(document).ready(()=>{	
+			
 			$('.card').on("click",function(){
-				let id = $( this ).attr('id');
-				let price = $( this ).attr('price');
-				let pick = $( this ).attr('pick');
-				//let pick = $(this).children().eq(0).attr('pick');
-				//let pick = $('.card > img[pick="0"]').attr('pick');
+				const id = $( this ).attr('id');
+				const price = $( this ).attr('price');
+				const pick = $( this ).attr('pick');
+				
 				if(pick=="0"){
 					$( this ).attr('pick','1');
 					$("#cart"+id).css("display","none");
 					$("#check"+id).css("display","inline");
-					let html = `
-						<div class="d-flex flex-row justify-content-between">
-							<div>${id}</div>
-							<div>${price}</div>
-						</div>
-					`;
-					$("#list").append(html);
+					
+					let input = $("input[name='order']");										
+					const oldData = input.attr("value");
+					if(!oldData){
+						let newItemList = [id];						
+						input.attr("value",JSON.stringify(newItemList));	
+						const html = `
+							<div class="d-flex flex-row justify-content-between" item-id=${id}>
+								<div>${id}</div>
+								<div>${price}</div>
+								<div onClick="deleteItem(${id})" del-id=${id}>x</div>
+							</div>
+						`;
+						$("#list").append(html);
+					}else{
+						let oldList = JSON.parse(oldData);
+						// Check duplicate
+						if(!oldList.includes(id)){
+							input.attr("value",JSON.stringify([...oldList,id]));
+							let html = `
+								<div class="d-flex flex-row justify-content-between" item-id=${id}>
+									<div>${id}</div>
+									<div>${price}</div>
+									<div onClick="deleteItem(${id})" name="delete" del-id=${id}>x</div>
+								</div>
+							`;
+							$("#list").append(html);
+						}
+					}				
+					
 				}else{
 					$( this ).attr('pick','0');
 					$("#cart"+id).css("display","inline");
 					$("#check"+id).css("display","none");
+					deleteItem(id);
 				}
-				console.log(id,price,pick);
-			});
-			
+				//console.log(id,price,pick);
+			});		
 		
 		});
 	</script>
