@@ -55,6 +55,8 @@
 		</div>
 	
 	</div>
+	<!-- Modal -->
+	<div th:replace="fragments/common::errorAlert"></div>
 	
 
 	<script>
@@ -161,6 +163,10 @@
 	}
 	
 	$("document").ready(function(){
+		//Close Modal 
+		$(".errorAlertClose").click(function(){
+			$("#errorAlert").modal('hide');
+		});
 		
 		$("button[name='action']").on("click",function(){
 			let name = $("#name").val();
@@ -170,9 +176,12 @@
 			let oldShop = $("#oldShop").val();
 			
 			// check name and age
+			if(!name || !age){
+				$("#errorAlertBody").text((!name && !age)?"User Name and age is required!":(!name)?"User Name is required!":"Age is required!");
+				$("#errorAlert").modal('show');
+				return;
+			}
 			
-			
-			return;
 			
 			// update
 			if(id && oldShop){
@@ -200,6 +209,7 @@
 		});
 	
 	});
+	
 			
 	</script>
 </body>
