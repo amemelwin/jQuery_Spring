@@ -169,6 +169,12 @@
 			let id = $("#id").val();
 			let oldShop = $("#oldShop").val();
 			
+			// check name and age
+			
+			
+			return;
+			
+			// update
 			if(id && oldShop){
 				if(oldShop != shop){
 					// Delete from old shop
@@ -177,9 +183,8 @@
 				}else{
 					// Update old shop
 					updateEmployee(shop,id,name,age);
-					// deleteEmployee(shop,id);
-					// appendElement(name,age,shop);
 				}
+			// create new
 			}else{
 				appendElement(name,age,shop);
 			}
